@@ -83,9 +83,8 @@ public:
         const IChannelFactoryPtr& channelFactory,
         const NQueryTrackerClient::NRecords::TActiveQuery& activeQuery,
         const TClusterDirectoryPtr& clusterDirectory,
-        const IInvokerPtr& controlInvoker,
-        const TStateTimeProfilingCountersMapPtr& stateTimeProfilingCountersMap)
-        : TQueryHandlerBase(stateClient, stateRoot, controlInvoker, config, activeQuery, stateTimeProfilingCountersMap)
+        const IInvokerPtr& controlInvoker)
+        : TQueryHandlerBase(stateClient, stateRoot, controlInvoker, config, activeQuery)
         , Settings_(ConvertTo<TChytSettingsPtr>(SettingsNode_))
         , Clique_(Settings_->Clique.value_or(config->DefaultClique))
         , Cluster_(Settings_->Cluster.value_or(config->DefaultCluster))
@@ -306,10 +305,9 @@ class TChytEngine
     : public IQueryEngine
 {
 public:
-    TChytEngine(IClientPtr stateClient, TYPath stateRoot, const TStateTimeProfilingCountersMapPtr& stateTimeProfilingCountersMap)
+    TChytEngine(IClientPtr stateClient, TYPath stateRoot)
         : StateClient_(std::move(stateClient))
         , StateRoot_(std::move(stateRoot))
-        , StateTimeProfilingCountersMap_(std::move(stateTimeProfilingCountersMap))
         , ControlQueue_(New<TActionQueue>("MockEngineControl"))
         , ClusterDirectory_(DynamicPointerCast<NNative::IConnection>(StateClient_->GetConnection())->GetClusterDirectory())
         , ChannelFactory_(CreateCachingChannelFactory(CreateTcpBusChannelFactory(New<NYT::NBus::TBusConfig>())))
@@ -317,7 +315,7 @@ public:
 
     IQueryHandlerPtr StartOrAttachQuery(NRecords::TActiveQuery activeQuery) override
     {
-        return New<TChytQueryHandler>(StateClient_, StateRoot_, ChytConfig_, ChannelFactory_, activeQuery, ClusterDirectory_, ControlQueue_->GetInvoker(), StateTimeProfilingCountersMap_);
+        return New<TChytQueryHandler>(StateClient_, StateRoot_, ChytConfig_, ChannelFactory_, activeQuery, ClusterDirectory_, ControlQueue_->GetInvoker());
     }
 
     void Reconfigure(const TEngineConfigBasePtr& config) override
@@ -328,7 +326,6 @@ public:
 private:
     const IClientPtr StateClient_;
     const TYPath StateRoot_;
-    const TStateTimeProfilingCountersMapPtr StateTimeProfilingCountersMap_;
     const TActionQueuePtr ControlQueue_;
     TChytEngineConfigPtr ChytConfig_;
     TClusterDirectoryPtr ClusterDirectory_;
@@ -337,9 +334,9 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-IQueryEnginePtr CreateChytEngine(const IClientPtr& stateClient, const TYPath& stateRoot, const TStateTimeProfilingCountersMapPtr& stateTimeProfilingCountersMap)
+IQueryEnginePtr CreateChytEngine(const IClientPtr& stateClient, const TYPath& stateRoot)
 {
-    return New<TChytEngine>(stateClient, stateRoot, stateTimeProfilingCountersMap);
+    return New<TChytEngine>(stateClient, stateRoot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
