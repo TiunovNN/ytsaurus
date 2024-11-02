@@ -2,7 +2,7 @@ name: Cache heater
 
 on:
   push:
-    - branches:
+    branches:
       - members/ilyaibraev/.*cache-heater.*
 
 env:
