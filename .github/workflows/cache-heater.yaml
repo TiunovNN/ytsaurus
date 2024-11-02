@@ -1,10 +1,9 @@
 name: Cache heater
 
 on:
-  push:
-    workflow_dispatch:
-    schedule:
-      - cron: '0 0,2,4,6,8,10,12,14,16,18,20,22 * * *'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0,2,4,6,8,10,12,14,16,18,20,22 * * *'
 
 env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
