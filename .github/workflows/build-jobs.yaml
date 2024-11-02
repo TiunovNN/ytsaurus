@@ -299,4 +299,4 @@ jobs:
       - name: Clear cache extra space (ya-make, ${{ matrix.build-type }})
         if: ${{ inputs.update-remote-cache }}
         run: |
-          ../ytsaurus/ytsaurus/ya gc dist_cache --yt-proxy=${{ vars.CI_YT_PROXY }} --yt-dir=//home/devtools/cache --yt-max-store-size=1500000000000 --yt-put &>> $GITHUB_OUTPUT
+          ../ytsaurus/ytsaurus/ya gc dist_cache --yt-proxy=${{ vars.CI_YT_PROXY }} --yt-dir=//home/devtools/cache --yt-max-store-size=1500000000000 --yt-put >> $GITHUB_OUTPUT
